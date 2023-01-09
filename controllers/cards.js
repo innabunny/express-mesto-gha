@@ -37,10 +37,10 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params.cardId;
-  cardSchema.findByIdAndDelete(cardId)
+  cardSchema.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        res.status(PAGE_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
+        res.status(PAGE_NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
       res.status(SUCCESS).send({
@@ -54,7 +54,7 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+        res.status(BAD_REQUEST).send({ message: 'Неккоректный _id карточки.' });
         return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
