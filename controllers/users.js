@@ -92,4 +92,4 @@ module.exports.updateAvatar = (req, res) => {
       }
       res.status(INTERNAL_SERVER_ERROR).send({message: 'Внутренняя ошибка сервера' });
     })
-}
+};

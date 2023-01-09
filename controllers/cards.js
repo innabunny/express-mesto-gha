@@ -113,4 +113,4 @@ module.exports.dislikeCard = (req, res) => {
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера'});
     })
-}
+};

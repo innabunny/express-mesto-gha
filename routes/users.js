@@ -7,4 +7,4 @@ userRouter.post('/', createUser);
 userRouter.patch('/me', updateUserProfile);
 userRouter.patch('/me/avatar', updateAvatar);
 
-module.exports = userRouter
+module.exports = userRouter;
