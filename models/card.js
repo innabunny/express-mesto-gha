@@ -1,36 +1,36 @@
 const mongoose = require('mongoose');
 
 const cardSchema = new mongoose.Schema({
-  name:{
+  name: {
     type: String,
     required: true,
     minLength: 2,
     maxLength: 30,
   },
-  link:{
+  link: {
     type: String,
     required: true,
     validate: {
       validator(v) {
         return /https?:\/\/(\w{3}\.)?[1-9a-z\-.]{1,}\w\w(\/[1-90a-z.,_@%&?+=~/-]{1,}\/?)?#?/i.test(v);
       },
-      message: 'Неккоректный адрес'
-    }
+      message: 'Неккоректный адрес',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'user'
+    ref: 'user',
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    default: []
+    default: [],
   }],
   createdAt: {
     type: Date,
-    default: Date.now()
-  }
+    default: Date.now(),
+  },
 });
 
 module.exports = mongoose.model('card', cardSchema);

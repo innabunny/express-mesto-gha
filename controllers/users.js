@@ -1,33 +1,33 @@
 const userSchema = require('../models/user.js');
-const { SUCCESS, BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, PAGE_NOT_FOUND } = require('../utils/constants.js')
+const { SUCCESS, BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, PAGE_NOT_FOUND } = require('../utils/constants');
 
 module.exports.getUsers = (req, res) => {
   userSchema
     .find({})
     .then((users) => res.status(SUCCESS).send(users))
     .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутрення ошибка сервера'});
-    })
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутрення ошибка сервера' });
+    });
 }
 
 module.exports.getUserById = (req, res) => {
   userSchema.findById(req.params.userId)
     .then((user) => {
-      if(!user) {
-        res.status(PAGE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден'});
-        return
+      if (!user) {
+        res.status(PAGE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
+        return;
       }
       res.status(SUCCESS).send({
         name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
       });
     })
     .catch((error) => {
-      if(error.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя'});
+      if (error.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя' });
         return;
       }
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутрення ошибка сервера'})
-    })
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутрення ошибка сервера' })
+    });
 }
 
 module.exports.createUser = (req, res) =>{
@@ -39,11 +39,11 @@ module.exports.createUser = (req, res) =>{
     }))
     .catch(error => {
       if (error.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({message: 'Переданы некорректные данные при создании пользователя'});
+        res.status(BAD_REQUEST).send({message: 'Переданы некорректные данные при создании пользователя' });
         return
       }
-      res.status(INTERNAL_SERVER_ERROR).send({message: 'Внутрення ошибка сервера'});
-    })
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутрення ошибка сервера' });
+    });
 }
 
 module.exports.updateUserProfile = (req, res) => {
@@ -53,21 +53,21 @@ module.exports.updateUserProfile = (req, res) => {
     {new: true, runValidators: true},
   )
     .then((user) => {
-      if(!user) {
-        res.status(PAGE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден'});
-        return
+      if (!user) {
+        res.status(PAGE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
+        return;
       }
       res.status(SUCCESS).send({
         name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
       })
     })
     .catch((error) => {
-      if(error.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля'});
-        return
+      if (error.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+        return;
       }
-      res.status(INTERNAL_SERVER_ERROR).send({message: 'Внутренняя ошибка сервера' });
-    })
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
+    });
 }
 
 module.exports.updateAvatar = (req, res) => {
@@ -77,19 +77,19 @@ module.exports.updateAvatar = (req, res) => {
     {new: true, runValidators: true},
   )
     .then((user) => {
-      if(!user) {
-        res.status(PAGE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден'});
-        return
+      if (!user) {
+        res.status(PAGE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
+        return;
       }
       res.status(SUCCESS).send({
         name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
       })
     })
     .catch((error) => {
-      if(error.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара.'});
-        return
+      if (error.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+        return;
       }
-      res.status(INTERNAL_SERVER_ERROR).send({message: 'Внутренняя ошибка сервера' });
-    })
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутренняя ошибка сервера' });
+    });
 };
