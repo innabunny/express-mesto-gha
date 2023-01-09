@@ -38,6 +38,7 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params.cardId;
   cardSchema.findByIdAndRemove(cardId)
+    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
         res.status(PAGE_NOT_FOUND).send({ message: 'Карточка не найдена' });
