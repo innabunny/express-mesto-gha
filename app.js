@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/card');
 
-
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://localhost:27017/mestodb', { useNewUrlParser: true });
 
@@ -18,7 +17,6 @@ app.use((req, res, next) => {
   req.user = {
     _id: '63bbe4266ed3b482ae9ade6b',
   };
-
   next();
 });
 
