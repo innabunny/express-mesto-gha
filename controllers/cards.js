@@ -18,12 +18,7 @@ module.exports.createCard = (req, res) => {
   cardSchema.create({ name, link, owner: req.user._id })
     .then((card) => {
       res.status(CREATED).send({
-        _id: card._id,
-        name: card.name,
-        link: card.link,
-        owner: card.owner,
-        likes: card.likes,
-        createdAt: card.createdAt,
+        data: card,
       });
     })
     .catch((error) => {
@@ -36,21 +31,15 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { cardId } = req.params.cardId;
-  cardSchema.findByIdAndRemove(cardId)
-    .populate(['owner', 'likes'])
+  cardSchema.findByIdAndRemove(req.params.cardId)
+    .select(['-createdAt'])
     .then((card) => {
       if (!card) {
         res.status(PAGE_NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
       res.status(SUCCESS).send({
-        _id: card._id,
-        name: card.name,
-        link: card.link,
-        owner: card.owner,
-        likes: card.likes,
-        createdAt: card.createdAt,
+        data: card,
       });
     })
     .catch((error) => {
@@ -74,12 +63,7 @@ module.exports.likeCard = (req, res) => {
         return;
       }
       res.status(SUCCESS).send({
-        _id: card._id,
-        name: card.name,
-        link: card.link,
-        owner: card.owner,
-        likes: card.likes,
-        createdAt: card.createdAt,
+        data: card,
       });
     })
     .catch((error) => {
@@ -103,12 +87,7 @@ module.exports.dislikeCard = (req, res) => {
         return;
       }
       res.status(SUCCESS).send({
-        _id: card._id,
-        name: card.name,
-        link: card.link,
-        owner: card.owner,
-        likes: card.likes,
-        createdAt: card.createdAt,
+        data: card,
       });
     })
     .catch((error) => {
