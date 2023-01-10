@@ -6,7 +6,7 @@ const {
 module.exports.getCards = (req, res) => {
   cardSchema.find({})
     .then((cards) => {
-      res.status(SUCCESS).send(cards);
+      res.send(cards);
     })
     .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Внутрення ошибка сервера' });
@@ -54,7 +54,7 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => {
   cardSchema.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user.cardId } },
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
@@ -78,7 +78,7 @@ module.exports.likeCard = (req, res) => {
 module.exports.dislikeCard = (req, res) => {
   cardSchema.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user.cardId } },
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
