@@ -120,18 +120,16 @@ module.exports.login = (req, res, next) => {
     })
     .catch(() => {
       next(new UnauthorizedError('Неправильные почта или пароль'));
-    })
-    .catch(next);
+    });
 };
 
 module.exports.getUserProfile = (req, res, next) => {
-  const { _id } = req.user;
-  userSchema.findById(_id)
+  userSchema.findById(req.user._id)
     .then((user) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       } else {
-        res.status(SUCCESS).send(user);
+        res.status(SUCCESS).send({ data: user });
       }
     })
     .catch((error) => {
