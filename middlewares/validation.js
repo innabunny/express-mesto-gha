@@ -1,76 +1,50 @@
 const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
 
-const validationCreateUser = celebrate({
+module.exports.validationUpdateAvatar = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom((value, helpers) => {
-      if (validator.isURL(value)) {
-        return value;
-      }
-      return helpers.message('Укажите ссылку на картинку');
-    }),
+    avatar: Joi.string().required().uri({ scheme: ['http', 'https'] }),
   }),
 });
 
-const validationLogin = celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-});
-
-const validationGetUserById = celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().required().length(24).hex(),
-  }),
-});
-
-const validationUpdateProfile = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-  }),
-});
-
-const validationUpdateAvatar = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().custom((value, helpers) => {
-      if (validator.isURL(value)) {
-        return value;
-      }
-      return helpers.message('Укажите ссылку на картинку');
-    }),
-  }),
-});
-
-const validationCreateCard = celebrate({
+module.exports.validationUpdateProfile = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().custom((value, helpers) => {
-      if (validator.isURL(value)) {
-        return value;
-      }
-      return helpers.message('Укажите ссылку на картинку');
-    }),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 
-const validationCardId = celebrate({
+module.exports.validationGetUserById = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required().length(24).hex(),
+    userId: Joi.string().hex().length(24),
   }),
 });
 
-module.exports = {
-  validationCreateUser,
-  validationLogin,
-  validationGetUserById,
-  validationUpdateProfile,
-  validationUpdateAvatar,
-  validationCreateCard,
-  validationCardId,
-};
+module.exports.validationCreateCard = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().uri({ scheme: ['http', 'https'] }),
+  }),
+});
+
+module.exports.validationLogin = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+});
+
+module.exports.validationCreateUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+    avatar: Joi.string().required().uri({ scheme: ['http', 'https'] }),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+});
+
+module.exports.validationCardId = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().hex().length(24),
+  }),
+});
