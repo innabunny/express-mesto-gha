@@ -22,7 +22,6 @@ const app = express();
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
 });
 
 app.use(helmet());
@@ -39,12 +38,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/signup', validationCreateUser, createUser);
 app.post('/signin', validationLogin, login);
-app.use(auth);
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/card'));
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
-});
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/card'));
+// app.use('*', (req, res) => {
+//   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+// });
 app.use(errors());
 app.use(errorHandler);
 
