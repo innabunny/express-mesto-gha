@@ -4,8 +4,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
-const { login, createUser } = require('./controllers/users.js');
-const { validationCreateUser, validationLogin } =require('./middlewares/validation');
+const { login, createUser } = require('./controllers/users');
+const { validationCreateUser, validationLogin } = require('./middlewares/validation');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 

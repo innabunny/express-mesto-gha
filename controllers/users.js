@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userSchema = require('../models/user');
 const {
-  SUCCESS, BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, PAGE_NOT_FOUND, CONFLICT_REQUEST,
+  SUCCESS, CONFLICT_REQUEST,
 } = require('../errors/constants');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
@@ -39,7 +39,9 @@ module.exports.getUserById = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   if (!email || !password) {
     next(new ValidationError('Переданы некорректные данные'));
   }
@@ -98,7 +100,7 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-       next(new ValidationError('Переданы некорректные данные при обновлении аватара.'));
+        next(new ValidationError('Переданы некорректные данные при обновлении аватара.'));
       }
       next(error);
     });

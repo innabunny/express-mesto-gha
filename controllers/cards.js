@@ -1,7 +1,7 @@
 const cardSchema = require('../models/card');
-const error = require('middlewares/errorHandler.js');
+// const error = require('middlewares/errorHandler.js');
 const {
-  SUCCESS, BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, PAGE_NOT_FOUND,
+  SUCCESS, CREATED,
 } = require('../errors/constants');
 const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
@@ -71,9 +71,9 @@ module.exports.likeCard = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-       next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.'));
+        next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.'));
       } else if (error.name === 'ValidationError') {
-       next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.'));
+        next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.'));
       } else {
         next(error);
       }
@@ -88,16 +88,16 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next( new NotFoundError('Карточка с указанным _id не найдена' ));
+        next(new NotFoundError('Карточка с указанным _id не найдена'));
       } else {
         res.status(SUCCESS).send(card);
       }
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.' ));
+        next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.'));
       } else if (error.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.' ));
+        next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка.'));
       } else {
         next(error);
       }
