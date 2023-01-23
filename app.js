@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const { login, createUser } = require('./controllers/users');
 const { validationCreateUser, validationLogin } = require('./middlewares/validation');
 const auth = require('./middlewares/auth');
-const errorHandler = require('./middlewares/errorHandler');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -31,15 +30,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/signup', validationCreateUser, createUser);
 app.post('/signin', validationLogin, login);
-app.use('/', auth, require('./routes/users'));
-app.use('/', auth, require('./routes/card'));
+app.use(auth);
+app.use('/', require('./routes/users'));
+app.use('/', require('./routes/card'));
 
 app.all('*', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
 
 app.use(errors());
-app.use(errorHandler);
+
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).send({ message: err.message });
+  next();
+});
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
