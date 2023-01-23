@@ -60,7 +60,7 @@ module.exports.createUser = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные'));
-      } else if (error.code === CONFLICT_REQUEST) {
+      } else if (error.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже существует'));
       } else {
         next(error);
@@ -130,7 +130,6 @@ module.exports.login = (req, res, next) => {
         })
         .catch(next);
     })
-    .catch(next);
 };
 
 module.exports.getUserProfile = (req, res, next) => {
