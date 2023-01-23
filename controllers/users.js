@@ -110,17 +110,27 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    next(new ValidationError('Переданы некорректные данные'));
+    throw new UnauthorizedError('Неправильные email или пароль');
   }
 
-  return userSchema.findUserByCredentials(email, password)
+  userSchema.findOne({ email }).select('+password')
+    .orFail(new UnauthorizedError('Неправильные email или пароль'))
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      return res.send({ token });
+      bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            throw new UnauthorizedError('Неправильные email или пароль');
+          }
+          const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+          res.status(SUCCESS).cookie('jwt', token, {
+            maxAge: 3600000 * 24 * 7,
+            sameSite: true,
+            httpOnly: true,
+          }).send({ message: 'Успешная регистрация' });
+        })
+        .catch(next);
     })
-    .catch(() => {
-      next(new UnauthorizedError('Неправильные почта или пароль'));
-    });
+    .catch(next);
 };
 
 module.exports.getUserProfile = (req, res, next) => {
