@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userSchema = require('../models/user');
 const {
-  SUCCESS, CONFLICT_REQUEST,
+  SUCCESS
 } = require('../errors/constants');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
@@ -129,7 +129,7 @@ module.exports.login = (req, res, next) => {
           }).send({ message: 'Успешная регистрация' });
         })
         .catch(next);
-    })
+    });
 };
 
 module.exports.getUserProfile = (req, res, next) => {
