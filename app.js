@@ -31,10 +31,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/signup', validationCreateUser, createUser);
 app.post('/signin', validationLogin, login);
-app.use('/users', auth, require('./routes/users'));
-app.use('/cards', auth, require('./routes/card'));
+app.use('/', auth, require('./routes/users'));
+app.use('/', auth, require('./routes/card'));
 
-app.use('*', (req, res) => {
+app.all('*', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
 

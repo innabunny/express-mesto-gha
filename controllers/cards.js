@@ -1,5 +1,4 @@
 const cardSchema = require('../models/card');
-// const error = require('middlewares/errorHandler.js');
 const {
   SUCCESS, CREATED,
 } = require('../errors/constants');
@@ -11,7 +10,7 @@ const ValidationError = require('../errors/ValidationError');
 module.exports.getCards = (req, res, next) => {
   cardSchema.find({})
     .then((cards) => {
-      res.send(cards);
+      res.send({ data: cards });
     })
     .catch(next);
 };

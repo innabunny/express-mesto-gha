@@ -20,7 +20,7 @@ module.exports.getUserById = (req, res, next) => {
   userSchema.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь с таким id не найден'));
+        throw new NotFoundError('Пользователь с таким id не найден');
       }
       res.status(SUCCESS).send({
         name: user.name,
@@ -49,11 +49,14 @@ module.exports.createUser = (req, res, next) => {
     .then((hashPassword) => userSchema.create({
       name, about, avatar, email, password: hashPassword,
     }))
-    .then(() => userSchema.findOne({ email }))
-    .then((userData) => {
-      const user = userData.toObject();
-      delete user.password;
-      res.send({ data: user });
+    .then((user) => {
+      res.send({
+        _id: user._id,
+        name,
+        about,
+        avatar,
+        email,
+      });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
@@ -73,8 +76,8 @@ module.exports.updateUserProfile = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
-      res.status(SUCCESS).send({
-        name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
+      res.send({
+        data: user,
       });
     })
     .catch((error) => {
@@ -92,8 +95,8 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
-      res.status(SUCCESS).send({
-        name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
+      res.send({
+        data: user,
       });
     })
     .catch((error) => {
@@ -111,20 +114,10 @@ module.exports.login = (req, res, next) => {
     throw new UnauthorizedError('Неправильные email или пароль');
   }
 
-  userSchema.findOne({ email }).select('+password')
-    .orFail(new UnauthorizedError('Неправильные email или пароль'))
+  userSchema.findUserByCredentials(email, password)
     .then((user) => {
-      bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            throw new UnauthorizedError('Неправильные email или пароль');
-          }
-          const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-          res.status(SUCCESS).cookie('jwt', token, {
-            maxAge: 3600000 * 24 * 7,
-            httpOnly: true,
-          }).send({ message: 'Успешная регистрация' });
-        });
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
     })
     .catch((error) => {
       if (error.name !== 'UnauthorizedError') {
@@ -139,7 +132,7 @@ module.exports.getUserProfile = (req, res, next) => {
   userSchema.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
+        throw new NotFoundError('Пользователь не найден');
       } else {
         res.status(SUCCESS).send({ data: user });
       }
