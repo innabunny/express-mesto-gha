@@ -126,7 +126,7 @@ module.exports.login = (req, res, next) => {
             maxAge: 3600000 * 24 * 7,
             httpOnly: true,
           }).send({ message: 'Успешная регистрация' });
-        })
+        });
     })
     .catch(next);
 };
