@@ -129,7 +129,8 @@ module.exports.login = (req, res, next) => {
           }).send({ message: 'Успешная регистрация' });
         })
         .catch(next);
-    });
+    })
+    .catch(next);
 };
 
 module.exports.getUserProfile = (req, res, next) => {
