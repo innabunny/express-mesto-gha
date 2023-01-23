@@ -127,7 +127,6 @@ module.exports.login = (req, res, next) => {
             httpOnly: true,
           }).send({ message: 'Успешная регистрация' });
         })
-        .catch(next);
     })
     .catch(next);
 };
