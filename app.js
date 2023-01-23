@@ -8,7 +8,7 @@ const { login, createUser } = require('./controllers/users');
 const { validationCreateUser, validationLogin } = require('./middlewares/validation');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/NotFoundError');
-// const errorHandler = require('./middlewares/errorHandler');
+const errorHandler = require('./middlewares/errorHandler');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -35,18 +35,14 @@ app.post('/signup', validationCreateUser, createUser);
 
 app.use('/', auth, require('./routes/users'));
 app.use('/', auth, require('./routes/card'));
+app.use(errors());
 
 app.use('*', (req, res, next) => {
   next(new NotFoundError('запрашиваемый ресурс не найден'));
   next();
 });
-app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(err.statusCode).send({ message: statusCode === 500 ? 'Error on server' : message });
-  return next();
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

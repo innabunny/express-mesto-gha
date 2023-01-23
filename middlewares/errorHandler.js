@@ -3,11 +3,11 @@ const errorHandler = (err, req, res, next) => {
     res.status(409).send({ message: 'Такой пользователь уже существует' });
     return;
   }
-  if (!err.statusCode) {
-    next(err);
-  } else {
+  if (err.statusCode) {
     res.status(err.statusCode).send({ message: err.message });
     return;
+  } else {
+    next(err);
   }
   res.status(500).send({ message: 'Ошибка сервера' });
 };
