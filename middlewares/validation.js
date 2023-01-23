@@ -4,7 +4,7 @@ const urlRegExp = /^https?:\/\/(www\.)?[a-zA-z\d-]+\.[a-z]{1,6}[\w\d\-._~:/?#[\]
 
 module.exports.validationUpdateAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(urlRegExp).required(),
+    avatar: Joi.string().pattern(/^https?:\/\/(www)?[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]+#?$/),
   }),
 });
 
@@ -23,8 +23,8 @@ module.exports.validationGetUserById = celebrate({
 
 module.exports.validationCreateCard = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().regex(urlRegExp).required(),
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(/^https?:\/\/(www)?[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]+#?$/),
   }),
 });
 
@@ -46,7 +46,7 @@ module.exports.validationCreateUser = celebrate({
 });
 
 module.exports.validationCardId = celebrate({
-  params: Joi.object({
-    cardId: Joi.string().hex().length(24).required(),
-  }).required(),
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex(),
+  }),
 });
