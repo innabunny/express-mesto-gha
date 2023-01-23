@@ -8,6 +8,7 @@ const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
 const UnauthorizedError = require('../errors/UnauthhotizedError');
+const BadRequestError = require('../errors/BadRequestError');
 
 module.exports.getUsers = (req, res, next) => {
   userSchema
@@ -23,15 +24,12 @@ module.exports.getUserById = (req, res, next) => {
         throw new NotFoundError('Пользователь с таким id не найден');
       }
       res.status(SUCCESS).send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        _id: user._id,
+        data: user,
       });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные'));
+        next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(error);
       }
@@ -60,7 +58,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные'));
+        next(new BadRequestError('Переданы некорректные данные'));
       } else if (error.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже существует'));
       } else {
@@ -82,7 +80,7 @@ module.exports.updateUserProfile = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные при обновлении профиля'));
+        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
       }
       next(error);
     });
@@ -101,7 +99,7 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные при обновлении аватара.'));
+        next(new BadRequestError('Переданы некорректные данные при обновлении аватара.'));
       }
       next(error);
     });
