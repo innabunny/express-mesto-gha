@@ -4,7 +4,6 @@ const userSchema = require('../models/user');
 const {
   SUCCESS,
 } = require('../errors/constants');
-const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
 const UnauthorizedError = require('../errors/UnauthhotizedError');
@@ -14,7 +13,9 @@ module.exports.getUsers = (req, res, next) => {
   userSchema
     .find({})
     .then((users) => res.status(SUCCESS).send({ data: users }))
-    .catch(next);
+    .catch((error) => {
+      next(error);
+    });
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -27,10 +28,10 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-      } else {
-        next(error);
+        next(new ValidationError('Переданы некорректные данные'));
+        return;
       }
+      next(error);
     });
 };
 
@@ -46,22 +47,16 @@ module.exports.createUser = (req, res, next) => {
       name, about, avatar, email, password: hashPassword,
     }))
     .then((user) => {
-      res.send({
-        _id: user._id,
-        name,
-        about,
-        avatar,
-        email,
-      });
+      const userData = user.toObject();
+      delete userData.password;
+      res.send({ data: userData });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-      } else if (error.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже существует'));
-      } else {
-        next(error);
+        next(new ValidationError('Переданы некорректные данные'));
+        return;
       }
+      next(error);
     });
 };
 
@@ -76,10 +71,10 @@ module.exports.updateUserProfile = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
-      } else {
-        next(error);
+        next(new ValidationError('Переданы некорректные данные при обновлении профиля'));
+        return;
       }
+      next(error);
     });
 };
 
@@ -117,7 +112,7 @@ module.exports.login = (req, res, next) => {
           res.send({ token });
         });
     })
-    .catch(next);
+    .catch((error) => next(error));
 };
 
 module.exports.getUserProfile = (req, res, next) => {
@@ -131,9 +126,9 @@ module.exports.getUserProfile = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-      } else {
-        next(error);
+        next(new ValidationError('Переданы некорректные данные'));
+        return;
       }
+      next(error);
     });
 };
