@@ -1,8 +1,9 @@
 const { celebrate, Joi } = require('celebrate');
+const urlRegExp = /^https?:\/\/(www\.)?[a-zA-z\d-]+\.[a-z]{1,6}[\w\d\-._~:/?#[\]@!$&'()*+,;=]{2,}#?$/;
 
 module.exports.validationUpdateAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().uri({ scheme: ['http', 'https'] }),
+    avatar: Joi.string().regex(urlRegExp).required(),
   }),
 });
 
@@ -35,11 +36,11 @@ module.exports.validationLogin = celebrate({
 
 module.exports.validationCreateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required().uri({ scheme: ['http', 'https'] }),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().regex(urlRegExp),
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
   }),
 });
 
