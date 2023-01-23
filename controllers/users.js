@@ -50,13 +50,11 @@ module.exports.createUser = (req, res, next) => {
       name, about, avatar, email, password: hashPassword,
     }))
     .then(() => userSchema.findOne({ email }))
-    .then((user) => res.status(SUCCESS).send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      _id: user._id,
-      email: user.email,
-    }))
+    .then((userData) => {
+      const user = userData.toObject();
+      delete user.password;
+      res.send({ data: user });
+    })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные'));
@@ -128,7 +126,13 @@ module.exports.login = (req, res, next) => {
           }).send({ message: 'Успешная регистрация' });
         });
     })
-    .catch(next);
+    .catch((error) => {
+      if (error.name !== 'UnauthorizedError') {
+        next(new UnauthorizedError('Ошибка авторизации'));
+      } else {
+        next(error);
+      }
+    });
 };
 
 module.exports.getUserProfile = (req, res, next) => {
