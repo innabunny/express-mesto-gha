@@ -11,7 +11,7 @@ module.exports.getCards = (req, res, next) => {
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch(next);
+    .catch((error) => next(error));
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -23,32 +23,30 @@ module.exports.createCard = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании карточки'));
-      } else {
-        next(error);
+        return;
       }
+      next(error);
     });
 };
 
 module.exports.deleteCard = (req, res, next) => {
   cardSchema.findById(req.params.cardId)
-    .select(['-createdAt'])
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
       } else if (!card.owner.equals(req.user._id)) {
         throw new ForbiddenError('Вы не можете удалять карточки других пользователей');
       } else {
-        cardSchema.findByIdAndRemove(req.params.cardId)
-          .then((deleteCard) => { res.status(SUCCESS).send(deleteCard); })
-          .catch(next);
+        card.deleteOne({ _id: card._id });
+        res.send(card);
       }
     })
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new BadRequestError('Неккоректный _id карточки.'));
-      } else {
-        next(error);
+        return;
       }
+      next(error);
     });
 };
 
@@ -69,9 +67,9 @@ module.exports.likeCard = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные для постановки/снятии лайка.'));
-      } else {
-        next(error);
+        return;
       }
+      next(error);
     });
 };
 
@@ -92,8 +90,8 @@ module.exports.dislikeCard = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные для постановки/снятии лайка.'));
-      } else {
-        next(error);
+        return;
       }
+      next(error);
     });
 };
