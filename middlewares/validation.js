@@ -22,8 +22,8 @@ module.exports.validationGetUserById = celebrate({
 
 module.exports.validationCreateCard = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().uri({ scheme: ['http', 'https'] }),
+    name: Joi.string().min(2).max(30).required(),
+    link: Joi.string().regex(urlRegExp).required(),
   }),
 });
 
@@ -45,7 +45,7 @@ module.exports.validationCreateUser = celebrate({
 });
 
 module.exports.validationCardId = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
-  }),
+  params: Joi.object({
+    cardId: Joi.string().hex().length(24).required(),
+  }).required(),
 });
