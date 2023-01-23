@@ -29,13 +29,6 @@ app.use(limiter);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '63bbe4266ed3b482ae9ade6b',
-//   };
-//   next();
-// });
-
 app.post('/signup', validationCreateUser, createUser);
 app.post('/signin', validationLogin, login);
 app.use('/users', auth, require('./routes/users'));

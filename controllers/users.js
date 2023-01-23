@@ -45,11 +45,11 @@ module.exports.createUser = (req, res, next) => {
   if (!email || !password) {
     next(new ValidationError('Переданы некорректные данные'));
   }
-
   bcrypt.hash(password, 10)
     .then((hashPassword) => userSchema.create({
       name, about, avatar, email, password: hashPassword,
     }))
+    .then(() => userSchema.findOne({ email }))
     .then((user) => res.status(SUCCESS).send({
       name: user.name,
       about: user.about,
