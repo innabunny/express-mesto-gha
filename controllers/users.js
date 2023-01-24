@@ -126,7 +126,7 @@ module.exports.getUserProfile = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       } else {
-        res.status(SUCCESS).send({ user });
+        res.status(SUCCESS).send({ data: user });
       }
     })
     .catch((error) => {
