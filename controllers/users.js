@@ -102,7 +102,6 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         next(new UnauthorizedError('Неправильные почта или пароль'));
-        return;
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
