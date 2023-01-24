@@ -35,13 +35,12 @@ app.post('/signup', validationCreateUser, createUser);
 
 app.use('/', auth, require('./routes/users'));
 app.use('/', auth, require('./routes/card'));
-app.use(errors());
 
 app.use('*', (req, res, next) => {
   next(new NotFoundError('запрашиваемый ресурс не найден'));
-  next();
 });
 
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {

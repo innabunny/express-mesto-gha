@@ -8,6 +8,7 @@ const NotFoundError = require('../errors/NotFoundError');
 
 module.exports.getCards = (req, res, next) => {
   cardSchema.find({})
+    .populate(['owner', 'likes'])
     .then((cards) => {
       res.send({ data: cards });
     })
@@ -18,7 +19,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   cardSchema.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.status(CREATED).send({ card });
+      res.status(CREATED).send({ data: card });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {

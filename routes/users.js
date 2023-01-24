@@ -2,8 +2,7 @@ const userRouter = require('express').Router();
 const {
   getUsers, getUserById, updateUserProfile, updateAvatar, getUserProfile,
 } = require('../controllers/users');
-const { validationUpdateAvatar, validationUpdateProfile, validationGetUserById } =
-require('../middlewares/validation');
+const { validationUpdateAvatar, validationUpdateProfile, validationGetUserById } = require('../middlewares/validation');
 
 userRouter.get('/users', getUsers);
 userRouter.get('users/me', getUserProfile);
