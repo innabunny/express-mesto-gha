@@ -101,18 +101,20 @@ module.exports.login = (req, res, next) => {
   userSchema.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new UnauthorizedError('Неправильные почта или пароль');
+        next(new UnauthorizedError('Неправильные почта или пароль'));
+        return;
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new UnauthorizedError('Неправильные почта или пароль');
+            next(new UnauthorizedError('Неправильные почта или пароль'));
+            return;
           }
           const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
           res.send({ token });
         });
     })
-    .catch((error) => next(error));
+    .catch(next);
 };
 
 module.exports.getUserProfile = (req, res, next) => {

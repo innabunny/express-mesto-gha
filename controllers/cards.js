@@ -1,6 +1,6 @@
 const cardSchema = require('../models/card');
 const {
-  SUCCESS, CREATED,
+  SUCCESS,
 } = require('../errors/constants');
 const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
@@ -12,21 +12,21 @@ module.exports.getCards = (req, res, next) => {
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch((error) => next(error));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   cardSchema.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.status(CREATED).send({ data: card });
+      res.send({ data: card });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании карточки'));
-        return;
+      } else {
+        next(error);
       }
-      next(error);
     });
 };
 
@@ -34,23 +34,23 @@ module.exports.deleteCard = (req, res, next) => {
   cardSchema.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Карточка не найдена');
+        next(new NotFoundError('Карточка не найдена'));
       } else if (!card.owner.equals(req.user._id)) {
-        throw new ForbiddenError('Вы не можете удалять карточки других пользователей');
+        next(ForbiddenError('Вы не можете удалять карточки других пользователей'));
       } else {
-       card.remove()
-         .then((data) => {
-           res.send({ data });
-         })
-         .catch(next);
+        card.remove()
+          .then((data) => {
+            res.send({ data });
+          })
+          .catch(next);
       }
     })
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new BadRequestError('Неккоректный _id карточки.'));
-        return;
+      } else {
+        next(error);
       }
-      next(error);
     });
 };
 
