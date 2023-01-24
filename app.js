@@ -33,8 +33,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post('/signin', validationLogin, login);
 app.post('/signup', validationCreateUser, createUser);
 
-app.use('/', auth, require('./routes/users'));
-app.use('/', auth, require('./routes/card'));
+app.use(auth);
+
+app.use('/', require('./routes/users'));
+app.use('/', require('./routes/card'));
 
 app.use('*', (req, res, next) => {
   next(new NotFoundError('запрашиваемый ресурс не найден'));

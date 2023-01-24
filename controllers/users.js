@@ -8,6 +8,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
 const UnauthorizedError = require('../errors/UnauthhotizedError');
 const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
   userSchema
@@ -54,9 +55,11 @@ module.exports.createUser = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные'));
-        return;
+      } else if (error.code === 1100) {
+        next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      } else {
+        next(error);
       }
-      next(error);
     });
 };
 
@@ -120,7 +123,7 @@ module.exports.getUserProfile = (req, res, next) => {
   userSchema.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден');
+        next(new NotFoundError('Пользователь не найден'));
       } else {
         res.status(SUCCESS).send({ user });
       }
@@ -128,7 +131,6 @@ module.exports.getUserProfile = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данные'));
-        return;
       }
       next(error);
     });
