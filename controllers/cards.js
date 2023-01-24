@@ -38,8 +38,11 @@ module.exports.deleteCard = (req, res, next) => {
       } else if (!card.owner.equals(req.user._id)) {
         throw new ForbiddenError('Вы не можете удалять карточки других пользователей');
       } else {
-        card.deleteOne({ _id: card._id });
-        res.send(card);
+       card.remove()
+         .then((data) => {
+           res.send({ data });
+         })
+         .catch(next);
       }
     })
     .catch((error) => {
@@ -57,12 +60,11 @@ module.exports.likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка с указанным _id не найдена');
       } else {
-        res.status(SUCCESS).send({ card });
+        res.status(SUCCESS).send({ data: card });
       }
     })
     .catch((error) => {
@@ -80,7 +82,6 @@ module.exports.dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка с указанным _id не найдена');
