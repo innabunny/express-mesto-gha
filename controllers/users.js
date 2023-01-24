@@ -23,14 +23,13 @@ module.exports.getUserById = (req, res, next) => {
   userSchema.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь с таким id не найден');
+        next(new NotFoundError('Пользователь с таким id не найден'));
       }
-      res.status(SUCCESS).send({ user });
+      res.status(SUCCESS).send({ data: user });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данные'));
-        return;
       }
       next(error);
     });
@@ -55,7 +54,7 @@ module.exports.createUser = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные'));
-      } else if (error.code === 1100) {
+      } else if (error.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
       } else {
         next(error);
@@ -68,14 +67,13 @@ module.exports.updateUserProfile = (req, res, next) => {
   userSchema.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден');
+        next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
-      res.send({ user });
+      res.send({ data: user });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные при обновлении профиля'));
-        return;
       }
       next(error);
     });
@@ -88,7 +86,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному _id не найден');
       }
-      res.send({ user });
+      res.send({ data: user });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
@@ -110,10 +108,13 @@ module.exports.login = (req, res, next) => {
         .then((matched) => {
           if (!matched) {
             next(new UnauthorizedError('Неправильные почта или пароль'));
-            return;
           }
           const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-          res.send({ token });
+          res.cookie('jwt', token, {
+            maxAge: 3600000 * 24 * 7,
+            httpOnly: true,
+            sameSite: true,
+          }).send({ data: user });
         });
     })
     .catch(next);
