@@ -38,7 +38,7 @@ app.use(auth);
 app.use('/', require('./routes/users'));
 app.use('/', require('./routes/card'));
 
-app.use('*', (req, res, next) => {
+app.all('*', (req, res, next) => {
   next(new NotFoundError('запрашиваемый ресурс не найден'));
 });
 
