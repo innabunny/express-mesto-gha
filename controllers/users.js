@@ -110,11 +110,7 @@ module.exports.login = (req, res, next) => {
             next(new UnauthorizedError('Неправильные почта или пароль'));
           }
           const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-          res.cookie('jwt', token, {
-            maxAge: 3600000 * 24 * 7,
-            httpOnly: true,
-          });
-          res.send({ token });
+          res.send({ token, name: user.name, email: user.email });
         });
     })
     .catch(next);
@@ -125,9 +121,8 @@ module.exports.getUserProfile = (req, res, next) => {
     .then((user) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
-      } else {
-        res.status(SUCCESS).send({ data: user });
       }
+      res.status(SUCCESS).send({ data: user });
     })
     .catch((error) => {
       if (error.name === 'CastError') {

@@ -31,8 +31,7 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  cardSchema.findById(req.params.cardId)
-    .populate(['owner', 'likes'])
+  cardSchema.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
         next(new NotFoundError('Карточка не найдена'));
@@ -40,7 +39,6 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card.owner.equals(req.user._id)) {
         next(new ForbiddenError('Вы не можете удалять карточки других пользователей'));
       }
-      cardSchema.deleteOne({ _id: card._id });
       res.send(card);
     })
     .catch((error) => {
@@ -58,13 +56,11 @@ module.exports.likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
         next(new NotFoundError('Карточка с указанным _id не найдена'));
-      } else {
-        res.status(SUCCESS).send({ data: card });
       }
+      res.status(SUCCESS).send({ data: card });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -83,9 +79,8 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new NotFoundError('Карточка с указанным _id не найдена'));
-      } else {
-        res.status(SUCCESS).send({ data: card });
       }
+      res.status(SUCCESS).send({ data: card });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
