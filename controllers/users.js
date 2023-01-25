@@ -25,7 +25,7 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь с таким id не найден'));
       }
-      res.status(SUCCESS).send({ data: user });
+      res.send(user);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -122,7 +122,7 @@ module.exports.getUserProfile = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(SUCCESS).send({ data: user });
+      res.send(user);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
